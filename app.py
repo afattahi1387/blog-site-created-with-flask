@@ -22,6 +22,7 @@ def create_tables_in_database():
             `id` INT(255) NOT NULL PRIMARY KEY AUTO_INCREMENT,
             `name` VARCHAR(255) NOT NULL,
             `image` VARCHAR(255) NOT NULL,
+            `category_id` VARCHAR(255) NOT NULL,
             `writer_id` INT(255) NOT NULL,
             `short_description` TEXT NOT NULL,
             `long_description` TEXT NOT NULL
@@ -83,7 +84,7 @@ def home():
 def single_article(id):
     categories = get_all_categories(False)
     article = get_single_article(id)
-    writer = get_single_writer(article[3])
+    writer = get_single_writer(article[4])
     return render_template('single_article.html', icon = config.APP_ICON, title = config.APP_NAME, categories = categories, article = article, writer = writer)
 
 if __name__ == '__main__':
