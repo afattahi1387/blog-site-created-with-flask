@@ -11,6 +11,13 @@ cursor = db_connection.cursor()
 
 def create_tables_in_database():
     cursor.execute('''
+        CREATE TABLE IF NOT EXISTS `categories` (
+            `id` INT(255) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `category_name` VARCHAR(255) NOT NULL
+        ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
+    ''')
+
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS `articles` (
             `id` INT(255) NOT NULL PRIMARY KEY AUTO_INCREMENT,
             `name` VARCHAR(255) NOT NULL,
