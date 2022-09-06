@@ -72,6 +72,14 @@ def get_single_writer(writerID):
 
     return writer
 
+def get_single_category(categoryID):
+    cursor.execute(f"SELECT * FROM categories WHERE id = '{categoryID}'")
+    category = cursor.fetchone()
+    if not category:
+        return False
+
+    return category
+
 create_tables_in_database()
 
 @app.route('/')
@@ -84,8 +92,9 @@ def home():
 def single_article(id):
     categories = get_all_categories(False)
     article = get_single_article(id)
+    category = get_single_category(article[3])
     writer = get_single_writer(article[4])
-    return render_template('single_article.html', icon = config.APP_ICON, title = config.APP_NAME, categories = categories, article = article, writer = writer)
+    return render_template('single_article.html', icon = config.APP_ICON, title = config.APP_NAME, categories = categories, article = article, category = category, writer = writer)
 
 if __name__ == '__main__':
     app.run(debug=True)
