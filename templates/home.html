@@ -52,15 +52,19 @@
                     </div>
                     <!-- Categories widget-->
                     <div class="card mb-4">
-                        <div class="card-header">Categories</div>
+                        <div class="card-header">دسته بندی ها</div>
                         <div class="card-body">
-                                <div class="col-sm-6">
+                            <div class="row">
+                                {% if categories %}
                                     <ul class="list-unstyled mb-0">
-                                        <li><a href="#!">Web Design</a></li>
-                                        <li><a href="#!">HTML</a></li>
-                                        <li><a href="#!">Freebies</a></li>
+                                        {% for category in categories %}
+                                            <li><a href="#!" style="text-decoration: none;">{{ category[1] }}</a></li>
+                                        {% endfor %}
                                     </ul>
-                                </div>
+                                {% else %}
+                                    دسته بندی وجود ندارد.
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>
