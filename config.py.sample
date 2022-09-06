@@ -1,0 +1,11 @@
+APP_ICON = 'your app icon name'
+
+APP_NAME = 'your app title'
+
+DB_HOST = 'localhost'
+
+DB_USERNAME = 'root'
+
+DB_PASSWORD = ''
+
+DB_NAME = 'your DB name'
