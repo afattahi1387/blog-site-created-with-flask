@@ -26,13 +26,17 @@ def create_tables_in_database():
         ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
     ''')
 
+def close_database():
+    db_connection.commit()
+    cursor.close()
+
 create_tables_in_database()
 
 @app.route('/')
 def home():
-    return render_template('home.html', icon = config.APP_ICON, title = config.APP_NAME)
+    cursor.execute('SELECT * FROM categories')
+    categories = cursor.fetchall()
+    return render_template('home.html', icon = config.APP_ICON, title = config.APP_NAME, categories = categories)
 
 if __name__ == '__main__':
-    db_connection.commit()
-    db_connection.close()
     app.run(debug=True)
