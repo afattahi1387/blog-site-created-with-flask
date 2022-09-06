@@ -9,3 +9,5 @@ DB_USERNAME = 'root'
 DB_PASSWORD = ''
 
 DB_NAME = 'your DB name'
+
+SECRET_KEY = 'secret_xxx'
