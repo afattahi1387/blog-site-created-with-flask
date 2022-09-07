@@ -47,15 +47,6 @@ def create_tables_in_database():
         ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
     ''')
 
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS `writers` (
-            `id` INT(255) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-            `name` VARCHAR(255) NOT NULL,
-            `image` VARCHAR(255) NOT NULL,
-            `description` TEXT NOT NULL
-        ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
-    ''');
-
 def close_database():
     db_connection.commit()
     cursor.close()
@@ -106,7 +97,7 @@ def get_single_article(articleID):
     return article
 
 def get_single_writer(writerID):
-    cursor.execute(f"SELECT * FROM writers WHERE id = '{writerID}'")
+    cursor.execute(f"SELECT * FROM users WHERE id = '{writerID}'")
     writer = cursor.fetchone()
     if not writer:
         return False
