@@ -180,5 +180,10 @@ def logout():
     logout_user()
     return redirect('/')
 
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html', title = config.APP_NAME)
+
 if __name__ == '__main__':
     app.run(debug=True)
