@@ -183,7 +183,12 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html', title = config.APP_NAME)
+    all_categories = get_all_categories(True)
+    categories = {}
+    for i in range(0, len(all_categories)):
+        categories[i + 1] = all_categories[i]
+
+    return render_template('dashboard.html', title = config.APP_NAME, categories = categories)
 
 if __name__ == '__main__':
     app.run(debug=True)
