@@ -256,5 +256,12 @@ def articles():
         articles[i + 1] = all_articles[i]
     return render_template('articles.html', title = config.APP_NAME, articles = articles)
 
+@app.route('/delete-article/<int:id>')
+@login_required
+def delete_article(id):
+    cursor.execute(f"DELETE FROM articles WHERE id = '{id}'")
+    flash('success-----مقاله شما با موفقیت حذف شد.')
+    return redirect(url_for('articles'))
+
 if __name__ == '__main__':
     app.run(debug=True)
