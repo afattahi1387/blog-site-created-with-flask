@@ -18,7 +18,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+def connect_to_database():
+    return MySQLdb.connect(host = config.DB_HOST, user = config.DB_USERNAME, passwd = config.DB_PASSWORD, db = config.DB_NAME)
+
 def create_tables_in_database():
+    db_connection = connect_to_database()
+
+    cursor = db_connection.cursor()
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS `users` (
             `id` INT(255) NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -47,17 +54,20 @@ def create_tables_in_database():
         ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
     ''')
 
-def close_database():
     db_connection.commit()
     cursor.close()
 
 def get_all_users():
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute('SELECT * FROM users')
     return cursor.fetchall()
 
 class User(UserMixin):
     
     def __init__(self, id):
+        db_connection = connect_to_database()
+        cursor = db_connection.cursor()
         self.id = id
         cursor.execute(f"SELECT * FROM users WHERE id = '{self.id}'")
         user = cursor.fetchone()
@@ -75,6 +85,8 @@ def load_user(userID):
     return User(userID)
 
 def get_all_categories(orderby):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     query = 'SELECT * FROM categories'
     if orderby:
         query += ' ORDER BY id DESC'
@@ -82,6 +94,8 @@ def get_all_categories(orderby):
     return cursor.fetchall()
 
 def get_all_articles(orderby):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     query = 'SELECT * FROM articles'
     if orderby:
         query += ' ORDER BY id DESC'
@@ -89,6 +103,8 @@ def get_all_articles(orderby):
     return cursor.fetchall()
 
 def get_single_article(articleID):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute(f"SELECT * FROM articles WHERE id = '{articleID}'")
     article = cursor.fetchone()
     if not article:
@@ -97,6 +113,8 @@ def get_single_article(articleID):
     return article
 
 def get_single_writer(writerID):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute(f"SELECT * FROM users WHERE id = '{writerID}'")
     writer = cursor.fetchone()
     if not writer:
@@ -105,6 +123,8 @@ def get_single_writer(writerID):
     return writer
 
 def get_single_category(categoryID):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute(f"SELECT * FROM categories WHERE id = '{categoryID}'")
     category = cursor.fetchone()
     if not category:
@@ -113,6 +133,8 @@ def get_single_category(categoryID):
     return category
 
 def check_user_exists(email, password):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute(f"SELECT * FROM users WHERE email = '{email}' AND password = '{password}'")
     if cursor.fetchone():
         return True
@@ -120,6 +142,8 @@ def check_user_exists(email, password):
     return False
 
 def get_single_user(email, password):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     if check_user_exists(email, password):
         cursor.execute(f"SELECT * FROM users WHERE email = '{email}' AND password = '{password}'")
         return cursor.fetchone()
@@ -127,6 +151,8 @@ def get_single_user(email, password):
     return False
 
 def articles_exists_for_category(categoryID):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute(f"SELECT * FROM articles WHERE category_id = '{categoryID}'")
     articles = cursor.fetchall()
     if articles:
@@ -191,6 +217,8 @@ def logout():
 @app.route('/dashboard', methods = ['GET', 'POST'])
 @login_required
 def dashboard():
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     if request.method == 'POST':
         if not request.form['form_name']:
             flash('danger-----اطلاعات وارد شده صحیح نمی باشد.')
@@ -202,6 +230,8 @@ def dashboard():
                 INSERT INTO categories (id, category_name) VALUES (NULL, '{category_name}')
             """)
             flash('success-----دسته بندی شما با موفقیت اضافه شد.')
+            db_connection.commit()
+            cursor.close()
             return redirect(url_for('dashboard'))
         elif request.form['form_name'] == 'edit_category':
             category_id = request.args.get('edit-category')
@@ -210,6 +240,8 @@ def dashboard():
                 UPDATE categories SET category_name = '{category_name}' WHERE id = '{category_id}'
             """)
             flash('success-----دسته بندی انتخاب شده با موفقیت ویرایش شد.')
+            db_connection.commit()
+            cursor.close()
             return redirect(url_for('dashboard'))
         else:
             flash('اطلاعات وارد شده صحیح نمی باشد.')
@@ -243,8 +275,12 @@ def delete_category(id):
         flash('danger-----این دسته بندی دارای مقاله است و نمی توانید آن را حذف کنید.')
         return redirect(url_for('dashboard'))
 
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute(f"DELETE FROM categories WHERE id = '{id}'")
     flash('success-----دسته بندی شما با موفقیت حذف شد.')
+    db_connection.commit()
+    cursor.close()
     return redirect(url_for('dashboard'))
 
 @app.route('/articles')
@@ -259,8 +295,12 @@ def articles():
 @app.route('/delete-article/<int:id>')
 @login_required
 def delete_article(id):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
     cursor.execute(f"DELETE FROM articles WHERE id = '{id}'")
     flash('success-----مقاله شما با موفقیت حذف شد.')
+    db_connection.commit()
+    cursor.close()
     return redirect(url_for('articles'))
 
 @app.route('/add-article')
