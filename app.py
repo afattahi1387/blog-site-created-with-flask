@@ -263,5 +263,10 @@ def delete_article(id):
     flash('success-----مقاله شما با موفقیت حذف شد.')
     return redirect(url_for('articles'))
 
+@app.route('/add-article')
+@login_required
+def add_article():
+    pass
+
 if __name__ == '__main__':
     app.run(debug=True)
