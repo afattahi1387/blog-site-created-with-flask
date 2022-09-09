@@ -203,6 +203,14 @@ def dashboard():
             """)
             flash('success-----دسته بندی شما با موفقیت اضافه شد.')
             return redirect(url_for('dashboard'))
+        elif request.form['form_name'] == 'edit_category':
+            category_id = request.args.get('edit-category')
+            category_name = request.form['category_name']
+            cursor.execute(f"""
+                UPDATE categories SET category_name = '{category_name}' WHERE id = '{category_id}'
+            """)
+            flash('success-----دسته بندی انتخاب شده با موفقیت ویرایش شد.')
+            return redirect(url_for('dashboard'))
         else:
             flash('اطلاعات وارد شده صحیح نمی باشد.')
             return redirect(url_for('dashboard'))
@@ -218,7 +226,15 @@ def dashboard():
             category.append(False)
         categories[i + 1] = category
 
-    return render_template('dashboard.html', title = config.APP_NAME, categories = categories)
+    if request.args.get('edit-category'):
+        show_form = 'edit_category'
+        category = get_single_category(request.args.get('edit-category'))
+        category_name = category[1]
+    else:
+        show_form = 'add_category'
+        category_name = ''
+
+    return render_template('dashboard.html', title = config.APP_NAME, categories = categories, show_form = show_form, category_name = category_name)
 
 @app.route('/delete-category/<int:id>')
 @login_required
