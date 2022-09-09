@@ -27,7 +27,8 @@
                             <thead>
                                 <tr>
                                     <th>ردیف</th>
-                                    <th>نام دسته بندی</th>
+                                    <th>نام مقاله</th>
+                                    <th>تصویر مقاله</th>
                                     <th>عملیات</th>
                                 </tr>
                             </thead>
@@ -37,6 +38,10 @@
                                         <td>{{ article }}</td>
                                         <td>{{ articles[article][1] }}</td>
                                         <td>
+                                            <img src="static/articles_images/{{ articles[article][2] }}" style="width: 200px; height: 70px; border-radius: 2px;">
+                                        </td>
+                                        <td>
+                                            <a href="/single-article/{{ articles[article][0] }}" class="btn btn-primary">مشاهده</a>
                                             <a href="#" class="btn btn-warning" style="color: white;">ویرایش</a>
                                             <button class="btn btn-danger" onclick="if(confirm('آیا از حذف این مقاله مطمئن هستید؟')){window.location.href = '/delete-article/{{ articles[article][0] }}';}">حذف</button>
                                         </td>
