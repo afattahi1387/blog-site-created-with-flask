@@ -247,5 +247,14 @@ def delete_category(id):
     flash('success-----دسته بندی شما با موفقیت حذف شد.')
     return redirect(url_for('dashboard'))
 
+@app.route('/articles')
+@login_required
+def articles():
+    all_articles = get_all_articles(True)
+    articles = {}
+    for i in range(0, len(all_articles)):
+        articles[i + 1] = all_articles[i]
+    return render_template('articles.html', title = config.APP_NAME, articles = articles)
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,44 @@
+{% extends 'dashboard_html_structure.html' %}
+
+{% block icon %}panel.jpg{% endblock %}
+
+{% block title %}مقالات{% endblock %}
+
+{% block content %}
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">مقالات</h1><br>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fa fa-newspaper"></i>
+                        مقالات
+                    </div>
+                    <div class="card-body">
+                        <table id="datatablesSimple">
+                            <thead>
+                                <tr>
+                                    <th>ردیف</th>
+                                    <th>نام دسته بندی</th>
+                                    <th>عملیات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for article in articles %}
+                                    <tr>
+                                        <td>{{ article }}</td>
+                                        <td>{{ articles[article][1] }}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-warning" style="color: white;">ویرایش</a>
+                                            <button class="btn btn-danger" onclick="if(confirm('آیا از حذف این مقاله مطمئن هستید؟')){window.location.href = '/delete-article/{{ articles[article][0] }}';}">حذف</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+{% endblock %}
