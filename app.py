@@ -153,7 +153,7 @@ def single_article(id):
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect('/') #Todo: change
+        return redirect(url_for('dashboard'))
     
     if request.method == 'POST':
         if not request.form['email']:
@@ -169,7 +169,7 @@ def login():
         if check_user_exists(email, password):
             user = get_single_user(email, password)
             login_user(User(user[0]))
-            return redirect('/') #Todo: change
+            return redirect(url_for('dashboard'))
         else:
             flash('اطلاعات وارد شده صحیح نمی باشند. لطفا مجددا تلاش فرمایید.')
             old_email = request.form['email']
