@@ -126,6 +126,14 @@ def get_single_user(email, password):
 
     return False
 
+def articles_exists_for_category(categoryID):
+    cursor.execute(f"SELECT * FROM articles WHERE category_id = '{categoryID}'")
+    articles = cursor.fetchall()
+    if articles:
+        return True
+
+    return False
+
 create_tables_in_database()
 
 @app.route('/')
@@ -180,15 +188,48 @@ def logout():
     logout_user()
     return redirect('/')
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods = ['GET', 'POST'])
 @login_required
 def dashboard():
+    if request.method == 'POST':
+        if not request.form['form_name']:
+            flash('danger-----اطلاعات وارد شده صحیح نمی باشد.')
+            return redirect(url_for('dashboard'))
+        
+        if request.form['form_name'] == 'add_category':
+            category_name = request.form['category_name']
+            cursor.execute(f"""
+                INSERT INTO categories (id, category_name) VALUES (NULL, '{category_name}')
+            """)
+            flash('success-----دسته بندی شما با موفقیت اضافه شد.')
+            return redirect(url_for('dashboard'))
+        else:
+            flash('اطلاعات وارد شده صحیح نمی باشد.')
+            return redirect(url_for('dashboard'))
+
     all_categories = get_all_categories(True)
     categories = {}
     for i in range(0, len(all_categories)):
-        categories[i + 1] = all_categories[i]
+        category = list(all_categories[i])
+        category_id = category[0]
+        if not articles_exists_for_category(category_id):
+            category.append(True)
+        else:
+            category.append(False)
+        categories[i + 1] = category
 
     return render_template('dashboard.html', title = config.APP_NAME, categories = categories)
+
+@app.route('/delete-category/<int:id>')
+@login_required
+def delete_category(id):
+    if articles_exists_for_category(id):
+        flash('danger-----این دسته بندی دارای مقاله است و نمی توانید آن را حذف کنید.')
+        return redirect(url_for('dashboard'))
+
+    cursor.execute(f"DELETE FROM categories WHERE id = '{id}'")
+    flash('success-----دسته بندی شما با موفقیت حذف شد.')
+    return redirect(url_for('dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True)
