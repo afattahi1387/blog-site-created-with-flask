@@ -1,3 +1,5 @@
+import os
+
 APP_ICON = 'your app icon name'
 
 APP_NAME = 'your app title'
@@ -11,3 +13,9 @@ DB_PASSWORD = ''
 DB_NAME = 'your DB name'
 
 SECRET_KEY = 'secret_xxx'
+
+CURRENT_WORKING_DIRECTORY = os.getcwd()
+
+UPLOAD_FOLDER = 'upload folder files'
+
+ALLOWED_EXTENSIONS = {} #Todo: Enter your allowed extensions
