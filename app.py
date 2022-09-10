@@ -301,6 +301,9 @@ def articles():
 def delete_article(id):
     db_connection = connect_to_database()
     cursor = db_connection.cursor()
+    article_image = get_single_article(id)[2]
+    image_path = os.path.join(config.CURRENT_WORKING_DIRECTORY + '/static/articles_images/', article_image)
+    os.remove(image_path)
     cursor.execute(f"DELETE FROM articles WHERE id = '{id}'")
     flash('success-----مقاله شما با موفقیت حذف شد.')
     db_connection.commit()
@@ -379,7 +382,6 @@ def upload_new_article_image(id):
         image_new_name = str(id) + '_' + image_name
         os.rename('static/uploads/' + image_name, 'static/uploads/' + image_new_name)
         shutil.copyfile(f'static/uploads/{image_new_name}', f'static/articles_images/{image_new_name}')
-        # os.system(f'copy static/uploads/{image_new_name} static/articles_images/{image_new_name}')
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_new_name)
         os.remove(image_path)
         cursor.execute(f"""
