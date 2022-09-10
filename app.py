@@ -10,10 +10,6 @@ app.config.update(
     SECRET_KEY = config.SECRET_KEY
 )
 
-db_connection = MySQLdb.connect(host = config.DB_HOST, user = config.DB_USERNAME, passwd = config.DB_PASSWORD, db = config.DB_NAME)
-
-cursor = db_connection.cursor()
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -303,10 +299,52 @@ def delete_article(id):
     cursor.close()
     return redirect(url_for('articles'))
 
-@app.route('/add-article')
+@app.route('/add-article', methods = ['GET', 'POST'])
 @login_required
 def add_article():
-    pass
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    error = False
+    errors = []
+    if request.method == 'POST':
+        if not request.form['name']:
+            flash('name-----فیلد نام نمی تواند خالی باشد.')
+            error = True
+            errors.append('name')
+
+        if request.form['category_id'] == 'empty':
+            flash('category_id-----لطفا دسته بندی مورد نظر خود را انتخاب کنید.')
+            error = True
+            errors.append('category_id')
+
+        if not request.form['short_description']:
+            flash('short_description-----فیلد مقدمه نمی تواند خالی باشد.')
+            error = True
+
+        if not request.form['long_description']:
+            flash('long_description-----فیلد بدنه نمی تواند خالی باشد.')
+            error = True
+
+        if error:
+            return redirect('/add-article?name_error=yes&category_error=yes')
+        
+        name = request.form['name']
+        category_id = request.form['category_id']
+        writer_id = current_user.get_id()
+        short_description = request.form['short_description']
+        long_description = request.form['long_description']
+        cursor.execute(f"""
+            INSERT INTO articles (id, name, image, category_id, writer_id, short_description, long_description) 
+            VALUES (NULL, '{name}', '', '{category_id}', '{writer_id}', '{short_description}', '{long_description}')
+        """)
+
+        last_insert_id = cursor.lastrowid
+        db_connection.commit()
+        cursor.close()
+        return redirect('/') #Todo: change
+
+    categories = get_all_categories(True)
+    return render_template('add_article.html', title = config.APP_NAME, categories = categories, errors = errors)
 
 if __name__ == '__main__':
     app.run(debug=True)

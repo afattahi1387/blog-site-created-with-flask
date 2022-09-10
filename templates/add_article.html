@@ -1,0 +1,109 @@
+{% extends 'dashboard_html_structure.html' %}
+
+{% block icon %}add.jpg{% endblock %}
+
+{% block title %}افزودن مقالات{% endblock %}
+
+{% block content %}
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">افزودن مقالات</h1><br>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fa fa-plus"></i>
+                        افزودن مقاله
+                    </div>
+                    <div class="card-body" style="direction: rtl;">
+                        <form method="POST">
+                            <input type="text" name="name" placeholder="نام مقاله" class="form-control {% if request.args.get('name_error') %} is-invalid {% endif %}">
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'name' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <select name="category_id" class="form-control {% if request.args.get('category_error') %} is-invalid {% endif %}">
+                                <option value="empty">دسته بندی مورد نظر خود را انتخاب کنید</option>
+                                {% for category in categories %}
+                                    <option value="{{ category[0] }}">{{ category[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'category_id' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <textarea name="short_description" id="short_description" rows="15" placeholder="مقدمه" class="form-control"></textarea>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'short_description' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <textarea name="long_description" id="long_description" rows="15" placeholder="بدنه" class="form-control"></textarea>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'long_description' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <input type="submit" value="افزودن" class="btn btn-success">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <script>
+      tinymce.init({
+        selector: '#short_description',
+        directionality: 'rtl',
+        plugins: [
+          'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+          'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+          'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+        ],
+        toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+          'alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
+      });
+
+      tinymce.init({
+        selector: '#long_description',
+        directionality: 'rtl',
+        plugins: [
+          'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+          'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+          'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+        ],
+        toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+          'alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
+      });
+    </script>
+{% endblock %}
