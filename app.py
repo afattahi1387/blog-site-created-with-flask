@@ -1,10 +1,14 @@
 import os
 import config
 import MySQLdb
+import shutil
+from werkzeug.utils import secure_filename
 from flask import Flask, flash, render_template, request, redirect, url_for, Response, session
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 
 app = Flask(__name__)
+
+app.config['UPLOAD_FOLDER'] = config.UPLOAD_FOLDER
 
 app.config.update(
     SECRET_KEY = config.SECRET_KEY
@@ -79,6 +83,10 @@ users = [User(user[0]) for user in get_all_users()]
 @login_manager.user_loader
 def load_user(userID):
     return User(userID)
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in config.ALLOWED_EXTENSIONS
 
 def get_all_categories(orderby):
     db_connection = connect_to_database()
@@ -341,10 +349,49 @@ def add_article():
         last_insert_id = cursor.lastrowid
         db_connection.commit()
         cursor.close()
-        return redirect('/') #Todo: change
+        return redirect(f'/upload-new-article-image/{last_insert_id}')
 
     categories = get_all_categories(True)
     return render_template('add_article.html', title = config.APP_NAME, categories = categories, errors = errors)
+
+@app.route('/upload-new-article-image/<int:id>', methods = ['GET', 'POST'])
+@login_required
+def upload_new_article_image(id):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    if request.method == 'POST':
+        if 'image' not in request.files:
+            flash('فایل به درستی آپلود نشده است.')
+            return redirect(f'/upload-new-article-image/{id}')
+
+        image = request.files['image']
+        if not image:
+            flash('فایلی آپلود نشده است.')
+            return redirect(f'/upload-new-article-image/{id}')
+        
+        if not allowed_file(image.filename):
+            flash('پسوند فایل شما اجازه آپلود ندارد.')
+            return redirect(f'/upload-new-article-image/{id}')
+
+        image_name = secure_filename(image.filename)
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_name)
+        image.save(image_path)
+        image_new_name = str(id) + '_' + image_name
+        os.rename('static/uploads/' + image_name, 'static/uploads/' + image_new_name)
+        shutil.copyfile(f'static/uploads/{image_new_name}', f'static/articles_images/{image_new_name}')
+        # os.system(f'copy static/uploads/{image_new_name} static/articles_images/{image_new_name}')
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_new_name)
+        os.remove(image_path)
+        cursor.execute(f"""
+            UPDATE articles SET image = '{image_new_name}' WHERE id = '{id}'
+        """)
+
+        db_connection.commit()
+        cursor.close()
+        return redirect(f'/single-article/{id}')
+
+    article = get_single_article(id)
+    return render_template('upload_new_article_image.html', title = config.APP_NAME, article = article)
 
 if __name__ == '__main__':
     app.run(debug=True)
