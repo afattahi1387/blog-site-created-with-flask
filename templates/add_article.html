@@ -16,7 +16,7 @@
                     </div>
                     <div class="card-body" style="direction: rtl;">
                         <form method="POST">
-                            <input type="text" name="name" placeholder="نام مقاله" class="form-control {% if request.args.get('name_error') %} is-invalid {% endif %}">
+                            <input type="text" name="name" placeholder="نام مقاله" value="{% if 'add_article_name_value' in session %}{{ session['add_article_name_value'] }}{% endif %}" class="form-control {% if 'add_article_name_error' in session %} is-invalid {% endif %}">
                             {% with messages = get_flashed_messages() %}
                                 {% if messages %}
                                     {% for message in messages %}
@@ -28,10 +28,14 @@
                                 {% endif %}
                             {% endwith %}
                             <br>
-                            <select name="category_id" class="form-control {% if request.args.get('category_error') %} is-invalid {% endif %}">
+                            <select name="category_id" class="form-control {% if 'add_article_category_error' in session %} is-invalid {% endif %}">
                                 <option value="empty">دسته بندی مورد نظر خود را انتخاب کنید</option>
                                 {% for category in categories %}
-                                    <option value="{{ category[0] }}">{{ category[1] }}</option>
+                                    {% if 'add_article_category_value' in session and category[0] == session['add_article_category_value'] %}
+                                        <option value="{{ category[0] }}" selected>{{ category[1] }}</option>
+                                    {% else %}
+                                        <option value="{{ category[0] }}">{{ category[1] }}</option>
+                                    {% endif %}
                                 {% endfor %}
                             </select>
                             {% with messages = get_flashed_messages() %}
@@ -45,7 +49,9 @@
                                 {% endif %}
                             {% endwith %}
                             <br>
-                            <textarea name="short_description" id="short_description" rows="15" placeholder="مقدمه" class="form-control"></textarea>
+                            <textarea name="short_description" id="short_description" rows="15" placeholder="مقدمه" class="form-control">
+                                {% if 'add_article_short_description_value' in session %}{{ session['add_article_short_description_value'] }}{% endif %}
+                            </textarea>
                             {% with messages = get_flashed_messages() %}
                                 {% if messages %}
                                     {% for message in messages %}
@@ -57,7 +63,9 @@
                                 {% endif %}
                             {% endwith %}
                             <br>
-                            <textarea name="long_description" id="long_description" rows="15" placeholder="بدنه" class="form-control"></textarea>
+                            <textarea name="long_description" id="long_description" rows="15" placeholder="بدنه" class="form-control">
+                                {% if 'add_article_long_description_value' in session %}{{ session['add_article_long_description_value'] }}{% endif %}
+                            </textarea>
                             {% with messages = get_flashed_messages() %}
                                 {% if messages %}
                                     {% for message in messages %}
