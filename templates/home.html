@@ -21,7 +21,7 @@
                                 <a href="/single-article/{{ article[0] }}"><img class="card-img-top" src="static/articles_images/{{ article[2] }}" alt="تصویری به نمایش در نیامد." /></a>
                                 <div class="card-body">
                                     <h2 class="card-title h4">{{ article[1] }}</h2>
-                                    <p class="card-text">{{ article[5] }}</p>
+                                    <p class="card-text">{{ article[5]|safe }}</p>
                                     <a class="btn btn-primary" href="/single-article/{{ article[0] }}">مشاهده مقاله →</a>
                                 </div>
                             </div>
