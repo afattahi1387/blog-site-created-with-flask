@@ -64,7 +64,7 @@ def get_all_users():
     return cursor.fetchall()
 
 class User(UserMixin):
-    
+
     def __init__(self, id):
         db_connection = connect_to_database()
         cursor = db_connection.cursor()
@@ -113,7 +113,7 @@ def get_single_article(articleID):
     article = cursor.fetchone()
     if not article:
         return False
-    
+
     return article
 
 def get_single_writer(writerID):
@@ -142,7 +142,7 @@ def check_user_exists(email, password):
     cursor.execute(f"SELECT * FROM users WHERE email = '{email}' AND password = '{password}'")
     if cursor.fetchone():
         return True
-    
+
     return False
 
 def get_single_user(email, password):
@@ -184,7 +184,7 @@ def single_article(id):
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-    
+
     if request.method == 'POST':
         if not request.form['email']:
             flash('فیلد ایمیل الزامی است.')
@@ -227,7 +227,7 @@ def dashboard():
         if not request.form['form_name']:
             flash('danger-----اطلاعات وارد شده صحیح نمی باشد.')
             return redirect(url_for('dashboard'))
-        
+
         if request.form['form_name'] == 'add_category':
             category_name = request.form['category_name']
             cursor.execute(f"""
@@ -316,17 +316,16 @@ def add_article():
     db_connection = connect_to_database()
     cursor = db_connection.cursor()
     error = False
-    errors = []
     if request.method == 'POST':
         if not request.form['name']:
             flash('name-----فیلد نام نمی تواند خالی باشد.')
             error = True
-            errors.append('name')
+            session['add_article_name_error'] = True
 
         if request.form['category_id'] == 'empty':
             flash('category_id-----لطفا دسته بندی مورد نظر خود را انتخاب کنید.')
             error = True
-            errors.append('category_id')
+            session['add_article_category_error'] = True
 
         if not request.form['short_description']:
             flash('short_description-----فیلد مقدمه نمی تواند خالی باشد.')
@@ -337,25 +336,43 @@ def add_article():
             error = True
 
         if error:
-            return redirect('/add-article?name_error=yes&category_error=yes')
-        
+            if request.form['name'] and 'add_article_name_error' in session:
+                session.pop('add_article_name_error', None)
+
+            if request.form['category_id'] != 'empty' and 'add_article_category_error' in session:
+                session.pop('add_article_category_error', None)
+
+            session['add_article_name_value'] = request.form['name']
+            if(request.form['category_id'] != 'empty'):
+                session['add_article_category_value'] = int(request.form['category_id'])
+
+            session['add_article_short_description_value'] = request.form['short_description']
+            session['add_article_long_description_value'] = request.form['long_description']
+            return redirect('/add-article')
+
         name = request.form['name']
         category_id = request.form['category_id']
         writer_id = current_user.get_id()
         short_description = request.form['short_description']
         long_description = request.form['long_description']
         cursor.execute(f"""
-            INSERT INTO articles (id, name, image, category_id, writer_id, short_description, long_description) 
+            INSERT INTO articles (id, name, image, category_id, writer_id, short_description, long_description)
             VALUES (NULL, '{name}', '', '{category_id}', '{writer_id}', '{short_description}', '{long_description}')
         """)
 
         last_insert_id = cursor.lastrowid
         db_connection.commit()
         cursor.close()
+        session.pop('add_article_name_value', None)
+        session.pop('add_article_category_value', None)
+        session.pop('add_article_short_description_value', None)
+        session.pop('add_article_long_description_value', None)
+        session.pop('add_article_name_error', None)
+        session.pop('add_article_category_error', None)
         return redirect(f'/upload-new-article-image/{last_insert_id}')
 
     categories = get_all_categories(True)
-    return render_template('add_article.html', title = config.APP_NAME, categories = categories, errors = errors)
+    return render_template('add_article.html', title = config.APP_NAME, categories = categories)
 
 @app.route('/upload-new-article-image/<int:id>', methods = ['GET', 'POST'])
 @login_required
@@ -371,7 +388,7 @@ def upload_new_article_image(id):
         if not image:
             flash('فایلی آپلود نشده است.')
             return redirect(f'/upload-new-article-image/{id}')
-        
+
         if not allowed_file(image.filename):
             flash('پسوند فایل شما اجازه آپلود ندارد.')
             return redirect(f'/upload-new-article-image/{id}')
@@ -394,6 +411,82 @@ def upload_new_article_image(id):
 
     article = get_single_article(id)
     return render_template('upload_new_article_image.html', title = config.APP_NAME, article = article)
+
+@app.route('/edit-article/<int:id>', methods = ['GET', 'POST'])
+@login_required
+def edit_article(id):
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    error = False
+    if request.method == 'POST':
+        if not request.form['name']:
+            flash('name-----فیلد نام نمی تواند خالی باشد.')
+            error = True
+            session['edit_article_name_error'] = True
+
+        if not request.form['short_description']:
+            flash('short_description-----فیلد مقدمه نمی تواند خالی باشد.')
+            error = True
+
+        if not request.form['long_description']:
+            flash('long_description-----فیلد بدنه نمی تواند خالی باشد.')
+            error = True
+
+        if error:
+            if request.form['name'] and 'edit_article_name_error' in session:
+                session.pop('edit_article_name_error', None)
+
+            if request.form['short_description'] != '':
+                session['edit_article_name_value'] = request.form['name']
+
+            if request.form['long_description'] != '':
+                session['edit_article_name_value'] = request.form['name']
+
+            session['edit_article_short_description_value'] = request.form['short_description']
+            session['edit_article_long_description_value'] = request.form['long_description']
+            return redirect(f'/edit-article/{id}')
+
+        name = request.form['name']
+        category_id = request.form['category_id']
+        short_description = request.form['short_description']
+        long_description = request.form['long_description']
+        article = get_single_article(id)
+        if not request.files['image']:
+            image_new_name = article[2]
+        else:
+            image = request.files['image']
+            if not allowed_file(image.filename):
+                flash('image-----پسوند فایل شما اجازه آپلود ندارد.')
+                return redirect(f'/edit-article/{id}')
+
+            os.remove(os.path.join(config.CURRENT_WORKING_DIRECTORY + '/static/articles_images/' + article[2]))
+            image_name = secure_filename(image.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_name)
+            image.save(image_path)
+            image_new_name = str(id) + '_' + image_name
+            os.rename(f'static/uploads/{image_name}', f'static/uploads/{image_new_name}')
+            shutil.copyfile(f'static/uploads/{image_new_name}', f'static/articles_images/{image_new_name}')
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], image_new_name))
+
+        cursor.execute(f"""
+            UPDATE articles SET name = '{name}',
+            category_id = '{category_id}',
+            short_description = '{short_description}',
+            long_description = '{long_description}',
+            image = '{image_new_name}' WHERE id = '{id}'
+        """)
+
+        db_connection.commit()
+        cursor.close()
+        session.pop('edit_article_name_value', None)
+        session.pop('edit_article_short_description_value', None)
+        session.pop('edit_article_long_description_value', None)
+        session.pop('edit_article_name_error', None)
+        return redirect(f'/single-article/{id}')
+
+    categories = get_all_categories(True)
+    article = get_single_article(id)
+    return render_template('edit_article.html', title = config.APP_NAME, categories = categories, article = article)
 
 if __name__ == '__main__':
     app.run(debug=True)

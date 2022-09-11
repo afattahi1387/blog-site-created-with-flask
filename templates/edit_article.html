@@ -1,0 +1,130 @@
+{% extends 'dashboard_html_structure.html' %}
+
+{% block icon %}edit.png{% endblock %}
+
+{% block title %}ویرایش مقاله: {{ article[1] }}{% endblock %}
+
+{% block content %}
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <h1 class="mt-4">ویرایش مقاله</h1><br>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fa fa-edit"></i>
+                        ویرایش مقاله: {{ article[1] }}
+                    </div>
+                    <div class="card-body" style="direction: rtl;">
+                        <form method="POST" enctype="multipart/form-data">
+                            <input type="text" name="name" placeholder="نام مقاله" value="{% if 'edit_article_name_value' in session %} {{ session.get('edit_article_name_value') }} {% else %} {{ article[1] }} {% endif %}" class="form-control {% if 'edit_article_name_error' in session %} is-invalid {% endif %}">
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'name' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <select name="category_id" class="form-control">
+                                {% for category in categories %}
+                                    {% if category[0] == article[4] %}
+                                        <option value="{{ category[0] }}" selected>{{ category[1] }}</option>
+                                    {% else %}
+                                        <option value="{{ category[0] }}">{{ category[1] }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select><br>
+                            <textarea name="short_description" id="short_description" rows="15" placeholder="مقدمه" class="form-control">
+                                {% if 'edit_article_short_description_value' in session %}
+                                    {{ session.get('edit_article_short_description_value') }}
+                                {% else %}
+                                    {{ article[5] }}
+                                {% endif %}
+                            </textarea>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'short_description' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <textarea name="long_description" id="long_description" rows="15" placeholder="بدنه" class="form-control">
+                                {% if 'edit_article_long_description_value' in session %}
+                                    {{ session.get('edit_article_long_description_value') }}
+                                {% else %}
+                                    {{ article[6] }}
+                                {% endif %}
+                            </textarea>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'long_description' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <img src="/static/articles_images/{{ article[2] }}" alt="تصویری به نمایش در نیامد." style="width: 100%; height: 300px; border: none; border-radius: 5px;">
+                            <br><br>
+                            <div class="mb-3">
+                                <label for="image" class="form-label">در صورت تمایل می توانید از کادر زیر، تصویر جدیدی برای این مقاله انتخاب کنید:</label>
+                                <input class="form-control" name="image" type="file" id="image">
+                            </div>
+                            {% with messages = get_flashed_messages() %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        {% if message.split('-----')[0] == 'long_description' %}
+                                            <span class="text-danger">{{ message.split('-----')[1] }}</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <br>
+                                {% endif %}
+                            {% endwith %}
+                            <br>
+                            <input type="submit" value="ویرایش" class="btn btn-warning" style="color: white;">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <script>
+      tinymce.init({
+        selector: '#short_description',
+        directionality: 'rtl',
+        plugins: [
+          'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+          'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+          'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+        ],
+        toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+          'alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
+      });
+
+      tinymce.init({
+        selector: '#long_description',
+        directionality: 'rtl',
+        plugins: [
+          'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+          'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+          'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+        ],
+        toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+          'alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
+      });
+    </script>
+{% endblock %}

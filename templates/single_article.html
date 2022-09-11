@@ -24,7 +24,11 @@
                             <div class="text-muted fst-italic mb-2">نویسنده: {{ writer[1] }}</div>
                         </header>
                         <!-- Preview image figure-->
-                        <figure class="mb-4"><img class="img-fluid rounded" src="/static/articles_images/{{ article[2] }}" alt="تصویری به نمایش در نیامد." /></figure>
+                        <figure class="mb-4"><img class="img-fluid rounded" src="/static/articles_images/{{ article[2] }}" alt="تصویری به نمایش در نیامد." />
+                            {% if current_user.is_authenticated %}
+                                <br><br><a href="#" class="btn btn-warning" style="color: white;">ویرایش</a>
+                            {% endif %}
+                        </figure>
                         {{ article[5] }}
                         <hr>
                         {{ article[6] }}
