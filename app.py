@@ -225,6 +225,23 @@ def articles_exists_for_category(category_id):
 
     return False
 
+def get_user_articles(user_id, orderby):
+    """
+        This function receives an user id and returns user articles.
+    """
+
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    query = f"SELECT * FROM articles WHERE writer_id = '{user_id}'"
+    if orderby:
+        query += " ORDER BY id DESC"
+    cursor.execute(query)
+    articles = cursor.fetchall()
+    if not articles:
+        return False
+    
+    return articles
+
 create_tables_in_database()
 
 @app.route('/')
@@ -390,7 +407,7 @@ def articles():
         This function is for articles page in admins dashboard.
     """
 
-    all_articles = get_all_articles(True)
+    all_articles = get_user_articles(current_user.get_id(), True)
     articles = {}
     for i in range(0, len(all_articles)):
         articles[i + 1] = all_articles[i]
