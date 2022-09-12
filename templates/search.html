@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block title %}
-{{ page_title }}
+نتایج جستجو برای: {{ searched_word }}
 {% endblock %}
 
 {% block content %}
@@ -16,9 +16,9 @@
                 <!-- Blog entries-->
                 <div class="col-lg-8">
                     {% if articles %}
-                        <h2>{{ page_title }}</h2><br>
+                        <h2>نتایج جستجو برای: {{ searched_word }}</h2><br>
                     {% endif %}
-                    
+
                     {% if articles %}
                         {% for article in articles %}
                             <div class="card mb-4">
@@ -54,7 +54,7 @@
                         <div class="card-header">جستجو</div>
                         <div class="card-body">
                             <form action="/search" method="GET">
-                                <input class="form-control" type="text" name="searched_word" placeholder="جستجو..." aria-label="جستجو..." aria-describedby="button-search" /><br>
+                                <input class="form-control" type="text" name="searched_word" placeholder="جستجو..." value="{{ searched_word }}" aria-label="جستجو..." aria-describedby="button-search" /><br>
                                 <input type="submit" value="جستجو" class="btn btn-primary">
                             </form>
                         </div>

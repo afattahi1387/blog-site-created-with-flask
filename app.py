@@ -259,10 +259,35 @@ def get_user_articles(user_id, orderby):
     
     return articles
 
+def search_in_articles(searched_word):
+    """
+        This function is for search articles page.
+    """
+
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    cursor.execute(f"""
+        SELECT * FROM articles WHERE
+        name LIKE '%{searched_word}%' OR
+        short_description LIKE '%{searched_word}%' OR
+        long_description LIKE '%{searched_word}%'
+        ORDER BY id DESC
+    """)
+
+    articles = cursor.fetchall()
+    if not articles:
+        return False
+    
+    return articles
+
 create_tables_in_database()
 
 @app.route('/')
 def home():
+    """
+        This function is for home page.
+    """
+
     categories = get_all_categories(False)
     articles = get_all_articles(True)
     return render_template('home.html',
@@ -273,6 +298,12 @@ def home():
 
 @app.route('/category/<int:category_id>')
 def category(category_id):
+    """
+        This function is for single category page.
+        First receives a category id, Then 
+        Returns this category articles.
+    """
+
     if not get_single_category(category_id):
         page_title = 'مقاله ای یافت نشد!'
     else:
@@ -284,6 +315,27 @@ def category(category_id):
                            title = config.APP_NAME,
                            categories = categories,
                            page_title = page_title,
+                           articles = articles)
+
+@app.route('/search')
+def search():
+    """
+        This function is for search page.
+        First receives searched word,
+        Then returns search results.
+    """
+
+    if request.args.get('searched_word'):
+        searched_word = request.args.get('searched_word')
+    else:
+        searched_word = ''
+    categories = get_all_categories(False)
+    articles = search_in_articles(searched_word)
+    return render_template('search.html',
+                           icon = config.APP_ICON,
+                           title = config.APP_NAME,
+                           searched_word = searched_word,
+                           categories = categories,
                            articles = articles)
 
 @app.route('/single-article/<int:id>')
