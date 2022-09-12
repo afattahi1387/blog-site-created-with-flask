@@ -3,7 +3,7 @@ import os
 import shutil
 import MySQLdb
 from flask import Flask, flash, render_template, \
-                                 request, redirect, url_for, session
+                                 request, redirect, url_for, session, abort
 from flask_login import LoginManager, UserMixin, \
                                  login_required, login_user, logout_user, current_user
 from werkzeug.utils import secure_filename
@@ -381,6 +381,49 @@ def single_article(id):
                            category = category,
                            writer = writer,
                            comments = comments)
+
+@app.route('/add-comment/<int:article_id>', methods = ['GET', 'POST'])
+def add_comment(article_id):
+    """
+        This function is for add comment for an article.
+    """
+    error = False
+    if request.method != 'POST':
+        abort(404)
+
+    if not request.form['user_name']:
+        flash('user_name-----فیلد نام الزامی می باشد.')
+        session['add_comment_user_name_error'] = True
+        error = True
+
+    if not request.form['comment']:
+        flash('comment-----فیلد کامنت الزامی می باشد.')
+        error = True
+
+    if error:
+        if request.form['user_name']:
+            session['add_comment_user_name_value'] = request.form['user_name']
+            session.pop('add_comment_user_name_error', None)
+
+        if request.form['comment']:
+            session['add_comment_comment_value'] = request.form['comment']
+
+        return redirect(f'/single-article/{article_id}#send_c')
+
+    user_name = request.form['user_name']
+    comment = request.form['comment']
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    cursor.execute(f"""
+        INSERT INTO comments (id, user_name, article_id, comment)
+        VALUES (NULL, '{user_name}', '{article_id}', '{comment}')
+    """)
+    db_connection.commit()
+    cursor.close()
+    session.pop('add_comment_user_name_value', None)
+    session.pop('add_comment_comment_value', None)
+    session.pop('add_comment_user_name_error', None)
+    return redirect(f'/single-article/{article_id}#comments')
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():

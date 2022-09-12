@@ -39,14 +39,44 @@
                         <div class="card bg-light">
                             <div class="card-body">
                                 <!-- Comment form-->
-                                <form class="mb-4"><textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea></form>
+                                <h2 id="send_c">ارسال کامنت</h2><br>
+                                <form class="mb-4" action="/add-comment/{{ article[0] }}" method="POST">
+                                    <input type="text" name="user_name" placeholder="نام شما" value="{% if 'add_comment_user_name_value' in session %}{{ session.get('add_comment_user_name_value') }}{% endif %}" class="form-control {% if 'add_comment_user_name_error' in session %} is-invalid {% endif %}">
+                                    {% with messages = get_flashed_messages() %}
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if message.split('-----')[0] == 'user_name' %}
+                                                    <span class="text-danger">{{ message.split('-----')[1] }}</span><br>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endwith %}
+                                    <br>
+                                    <textarea class="form-control" rows="4" id="comment" name="comment" placeholder="متن کامنت شما">
+                                        {% if 'add_comment_comment_value' in session %}
+                                            {{ session.get('add_comment_comment_value') }}
+                                        {% endif %}
+                                    </textarea>
+                                    {% with messages = get_flashed_messages() %}
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                {% if message.split('-----')[0] == 'comment' %}
+                                                    <span class="text-danger">{{ message.split('-----')[1] }}</span><br>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    {% endwith %}
+                                    <br>
+                                    <input type="submit" value="ارسال" class="btn btn-success">
+                                </form>
                                 {% if comments %}
+                                    <h2 id="comments">کامنت ها</h2>
                                     {% for comment in comments %}
                                         <div class="d-flex">
                                             <div class="flex-shrink-0"><img class="rounded-circle" src="/static/icons/user.png" alt="کاربر" style="width: 80px;" /></div>
                                             <div class="ms-3">
                                                 <div class="fw-bold">{{ comment[1] }}</div>
-                                                {{ comment[3] }}
+                                                {{ comment[3]|safe }}
                                             </div>
                                         </div>
                                     {% endfor %}
@@ -92,4 +122,21 @@
     {% else %}
         <br><div class="alert alert-danger" style="margin: 5px;">مقاله ای یافت نشد!</div><br>
     {% endif %}
+
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <script>
+      tinymce.init({
+        selector: '#comment',
+        directionality: 'rtl',
+        plugins: [
+          'a11ychecker','advlist','advcode','advtable','autolink','checklist','export',
+          'lists','link','image','charmap','preview','anchor','searchreplace','visualblocks',
+          'powerpaste','fullscreen','formatpainter','insertdatetime','media','table','help','wordcount'
+        ],
+        toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
+          'alignleft aligncenter alignright alignjustify | ' +
+          'bullist numlist checklist outdent indent | removeformat | a11ycheck code table help'
+      });
+    </script>
 {% endblock %}
