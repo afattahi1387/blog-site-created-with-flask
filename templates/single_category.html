@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block title %}
-{{ title }} | صفحه اصلی
+{{ page_title }}
 {% endblock %}
 
 {% block content %}
@@ -16,9 +16,13 @@
                 <!-- Blog entries-->
                 <div class="col-lg-8">
                     {% if articles %}
+                        <h2>{{ page_title }}</h2><br>
+                    {% endif %}
+                    
+                    {% if articles %}
                         {% for article in articles %}
                             <div class="card mb-4">
-                                <a href="/single-article/{{ article[0] }}"><img class="card-img-top" src="static/articles_images/{{ article[2] }}" alt="تصویری به نمایش در نیامد." /></a>
+                                <a href="/single-article/{{ article[0] }}"><img class="card-img-top" src="/static/articles_images/{{ article[2] }}" alt="تصویری به نمایش در نیامد." /></a>
                                 <div class="card-body">
                                     <h2 class="card-title h4">{{ article[1] }}</h2>
                                     <p class="card-text">{{ article[5]|safe }}</p>

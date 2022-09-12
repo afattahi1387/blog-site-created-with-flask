@@ -142,6 +142,23 @@ def get_all_articles(orderby):
     cursor.execute(query)
     return cursor.fetchall()
 
+def get_category_articles(category_id, orderby):
+    """
+        This function receives a category id and returns this category articles.
+    """
+
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    query = f"SELECT * FROM articles WHERE category_id = '{category_id}'"
+    if orderby:
+        query += "ORDER BY id DESC"
+    cursor.execute(query)
+    articles = cursor.fetchall()
+    if not articles:
+        return False
+
+    return articles
+
 def get_single_article(article_id):
     """
         This function receives an article id and returns article.
@@ -252,6 +269,21 @@ def home():
                            icon = config.APP_ICON,
                            title = config.APP_NAME,
                            categories = categories,
+                           articles = articles)
+
+@app.route('/category/<int:category_id>')
+def category(category_id):
+    if not get_single_category(category_id):
+        page_title = 'مقاله ای یافت نشد!'
+    else:
+        page_title = 'نمایش مقالات برای دسته بندی: ' + get_single_category(category_id)[1]
+    articles = get_category_articles(category_id, True)
+    categories = get_all_categories(False)
+    return render_template('single_category.html',
+                           icon = config.APP_ICON,
+                           title = config.APP_NAME,
+                           categories = categories,
+                           page_title = page_title,
                            articles = articles)
 
 @app.route('/single-article/<int:id>')
@@ -407,10 +439,13 @@ def articles():
         This function is for articles page in admins dashboard.
     """
 
-    all_articles = get_user_articles(current_user.get_id(), True)
-    articles = {}
-    for i in range(0, len(all_articles)):
-        articles[i + 1] = all_articles[i]
+    if get_user_articles(current_user.get_id(), True):
+        all_articles = get_user_articles(current_user.get_id(), True)
+        articles = {}
+        for i in range(0, len(all_articles)):
+            articles[i + 1] = all_articles[i]
+    else:
+        articles = {}
     return render_template('articles.html', title = config.APP_NAME, articles = articles)
 
 @app.route('/delete-article/<int:id>')

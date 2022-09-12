@@ -97,7 +97,7 @@
                                 {% if categories %}
                                     <ul class="list-unstyled mb-0">
                                         {% for category in categories %}
-                                            <li><a href="#!" style="text-decoration: none;">{{ category[1] }}</a></li>
+                                            <li><a href="/category/{{ category[0] }}" style="text-decoration: none;">{{ category[1] }}</a></li>
                                         {% endfor %}
                                     </ul>
                                 {% else %}
