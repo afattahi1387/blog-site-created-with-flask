@@ -1,3 +1,4 @@
+"""This file for blog site created with flask."""
 import os
 import shutil
 import MySQLdb
@@ -152,7 +153,6 @@ def get_category_articles(category_id, orderby):
     query = f"SELECT * FROM articles WHERE category_id = '{category_id}'"
     if orderby:
         query += "ORDER BY id DESC"
-    cursor.execute(query)
     articles = cursor.fetchall()
     if not articles:
         return False
@@ -256,7 +256,6 @@ def get_user_articles(user_id, orderby):
     articles = cursor.fetchall()
     if not articles:
         return False
-    
     return articles
 
 def search_in_articles(searched_word):
@@ -277,7 +276,6 @@ def search_in_articles(searched_word):
     articles = cursor.fetchall()
     if not articles:
         return False
-    
     return articles
 
 create_tables_in_database()
@@ -300,7 +298,7 @@ def home():
 def category(category_id):
     """
         This function is for single category page.
-        First receives a category id, Then 
+        First receives a category id, Then
         Returns this category articles.
     """
 
@@ -387,7 +385,7 @@ def login():
             return redirect(url_for('login') + f'?email={old_email}')
 
     if request.args.get('email'):
-        email = request.args.get('email');
+        email = request.args.get('email')
     else:
         email = ''
 
