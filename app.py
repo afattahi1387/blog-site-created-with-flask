@@ -68,6 +68,15 @@ def create_tables_in_database():
         ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS `comments` (
+            `id` INT(255) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `user_name` VARCHAR(255) NOT NULL,
+            `article_id` INT(255) NOT NULL,
+            `comment` TEXT NOT NULL
+        ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
+    ''')
+
     db_connection.commit()
     cursor.close()
 
@@ -142,6 +151,22 @@ def get_all_articles(orderby):
         query += ' ORDER BY id DESC'
     cursor.execute(query)
     return cursor.fetchall()
+
+def get_article_comments(article_id):
+    """
+        This function receives an article id,
+        Then find and returns article comments.
+    """
+
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    cursor.execute(f"""
+        SELECT * FROM comments WHERE article_id = '{article_id}'
+    """)
+    comments = cursor.fetchall()
+    if not comments:
+        return False
+    return comments
 
 def get_category_articles(category_id, orderby):
     """
@@ -347,13 +372,15 @@ def single_article(id):
     article = get_single_article(id)
     category = get_single_category(article[3])
     writer = get_single_writer(article[4])
+    comments = get_article_comments(id)
     return render_template('single_article.html',
                            icon = config.APP_ICON,
                            title = config.APP_NAME,
                            categories = categories,
                            article = article,
                            category = category,
-                           writer = writer)
+                           writer = writer,
+                           comments = comments)
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
