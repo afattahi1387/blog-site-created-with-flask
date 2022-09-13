@@ -181,7 +181,6 @@ def count_article_votes(article_id, vote):
         This function receives an article id and vote,
         Then counts votes and returns number of votes.
     """
-    
     db_connection = connect_to_database()
     cursor = db_connection.cursor()
     votes_counter = 0
