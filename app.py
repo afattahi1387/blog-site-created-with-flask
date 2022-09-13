@@ -478,7 +478,7 @@ def add_vote(article_id, vote):
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     """
-        This function for login page.
+        This function is for login page.
     """
 
     if current_user.is_authenticated:
@@ -510,6 +510,86 @@ def login():
         email = ''
 
     return render_template('login.html', title = config.APP_NAME, email = email)
+
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    """
+        This function is for register page.
+    """
+
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        error = False
+        errors = []
+        fields = ['name', 'email', 'password', 'confirm_password']
+        if not request.form['name']:
+            flash('فیلد نام و نام خانوادگی الزامی می باشد.')
+            error = True
+            errors.append('name')
+
+        if not request.form['email']:
+            flash('فیلد ایمیل الزامی می باشد.')
+            error = True
+            errors.append('email')
+
+        if not request.form['password']:
+            flash('فیلد رمز عبور الزامی می باشد.')
+            error = True
+            errors.append('password')
+
+        if not request.form['confirm_password']:
+            flash('فیلد تکرار رمز عبور الزامی می باشد.')
+            error = True
+            errors.append('confirm_password')
+
+        if request.form['password'] != request.form['confirm_password']:
+            flash('رمز عبور به درستی تکرار نشده است. لطفاً تکرار رمز عبور را مجدداً وارد نمایید.')
+            error = True
+            if 'password' not in errors:
+                errors.append('password')
+
+            if 'confirm_password' not in errors:
+                errors.append('confirm_password')
+
+        if request.form['name'] and request.form['email'] and \
+            request.form['password'] and request.form['confirm_password'] and \
+                request.form['password'] == request.form['confirm_password'] and \
+                    check_user_exists(request.form['email'], request.form['password']):
+                    flash('کاربری با این مشخصات وجود دارد. لطفاً اطلاعات خود را تغییر دهید.')
+                    error = True
+
+        if error:
+            session['register_name_value'] = request.form['name']
+            session['register_email_value'] = request.form['email']
+            for e in errors:
+                session['register_' + e + '_error'] = True
+
+            for field in fields:
+                if request.form[field]:
+                    session.pop('register_' + field + '_error', None)
+            
+            return redirect(url_for('register'))
+
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        db_connection = connect_to_database()
+        cursor = db_connection.cursor()
+        cursor.execute(f"""
+            INSERT INTO users (id, name, email, password)
+            VALUES (NULL, '{name}', '{email}', '{password}')
+        """)
+        new_user_id = cursor.lastrowid
+        db_connection.commit()
+        cursor.close()
+        user = User(new_user_id)
+        login_user(user)
+        return redirect(url_for('dashboard'))
+
+    return render_template('register.html',
+                           title = config.APP_NAME)
 
 @app.route('/logout')
 @login_required

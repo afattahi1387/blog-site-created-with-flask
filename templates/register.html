@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fa">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>{{ title }} | ثبت نام</title>
+        <link rel="icon" href="/static/icons/register.png">
+        <link href="{{ url_for('static', filename = 'styles2.css') }}" rel="stylesheet" />
+        <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+    </head>
+    <body class="bg-primary">
+        <div id="layoutAuthentication">
+            <div id="layoutAuthentication_content">
+                <main>
+                    <div class="container">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-7">
+                                <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                    <div class="card-header"><h3 class="text-center font-weight-light my-4"><a href="/" style="text-decoration: none;">{{ title }}</a> | ثبت نام</h3></div>
+                                    <div class="card-body">
+                                        <form method="POST">
+                                            {% with messages = get_flashed_messages() %}
+                                                {% if messages %}
+                                                    {% for message in messages %}
+                                                        <div class="alert alert-danger" style="direction: rtl;">{{ message }}</div>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endwith %}
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control {% if 'register_name_error' in session %} is-invalid {% endif %}" id="name" name="name" type="text" placeholder="نام و نام خانوادگی" value="{% if 'register_name_value' in session %}{{ session.get('register_name_value') }}{% endif %}" />
+                                                <label for="name">نام و نام خانوادگی</label>
+                                            </div>
+                                            <div class="form-floating mb-3">
+                                                <input class="form-control {% if 'register_email_error' in session %} is-invalid {% endif %}" id="email" name="email" type="email" placeholder="ایمیل" value="{% if 'register_email_value' in session %}{{ session.get('register_email_value') }}{% endif %}" />
+                                                <label for="email">ایمیل</label>
+                                            </div>
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating mb-3 mb-md-0">
+                                                        <input class="form-control {% if 'register_password_error' in session %} is-invalid {% endif %}" id="password" name="password" type="password" placeholder="رمز عبور" />
+                                                        <label for="password">رمز عبور</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating mb-3 mb-md-0">
+                                                        <input class="form-control {% if 'register_confirm_password_error' in session %} is-invalid {% endif %}" id="confirm_password" name="confirm_password" type="password" placeholder="تکرار رمز عبور" />
+                                                        <label for="confirm_password">تکرار رمز عبور</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4 mb-0">
+                                                <div class="d-grid">
+                                                    <input type="submit" value="ثبت نام" class="btn btn-primary btn-block">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <!-- <div class="card-footer text-center py-3">
+                                        <div class="small"><a href="login.html">Have an account? Go to login</a></div>
+                                    </div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    </body>
+</html>
