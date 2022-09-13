@@ -176,6 +176,26 @@ def get_article_comments(article_id):
         return False
     return comments
 
+def count_article_votes(article_id, vote):
+    """
+        This function receives an article id and vote,
+        Then counts votes and returns number of votes.
+    """
+    
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    votes_counter = 0
+    cursor.execute(f'''
+        SELECT * FROM votes WHERE article_id = '{article_id}'
+        AND vote = '{vote}'
+    ''')
+    votes = cursor.fetchall()
+    if not votes:
+        return 0
+    for vote in votes:
+        votes_counter += 1
+    return votes_counter
+
 def get_category_articles(category_id, orderby):
     """
         This function receives a category id and returns this category articles.
@@ -381,6 +401,9 @@ def single_article(id):
     category = get_single_category(article[3])
     writer = get_single_writer(article[4])
     comments = get_article_comments(id)
+    great_votes = count_article_votes(id, 'great')
+    not_bad_votes = count_article_votes(id, 'not_bad')
+    bad_votes = count_article_votes(id, 'bad')
     return render_template('single_article.html',
                            icon = config.APP_ICON,
                            title = config.APP_NAME,
@@ -388,7 +411,10 @@ def single_article(id):
                            article = article,
                            category = category,
                            writer = writer,
-                           comments = comments)
+                           comments = comments,
+                           great_votes = great_votes,
+                           not_bad_votes = not_bad_votes,
+                           bad_votes = bad_votes)
 
 @app.route('/add-comment/<int:article_id>', methods = ['GET', 'POST'])
 def add_comment(article_id):
@@ -432,6 +458,23 @@ def add_comment(article_id):
     session.pop('add_comment_comment_value', None)
     session.pop('add_comment_user_name_error', None)
     return redirect(f'/single-article/{article_id}#comments')
+
+@app.route('/add-vote/<int:article_id>/<string:vote>')
+def add_vote(article_id, vote):
+    """
+        This function receives an article id and a vote,
+        Then save vote in votes table.
+    """
+
+    db_connection = connect_to_database()
+    cursor = db_connection.cursor()
+    cursor.execute(f"""
+        INSERT INTO votes (id, article_id, vote)
+        VALUES (NULL, '{article_id}', '{vote}')
+    """)
+    db_connection.commit()
+    cursor.close()
+    return redirect(f'/single-article/{article_id}#add_vote')
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():

@@ -32,7 +32,16 @@
                         {{ article[5]|safe }}
                         <hr>
                         {{ article[6]|safe }}
-                        <br><br>
+                        <br>
+                        <h4 id="add_vote">رای دادن</h4><br>
+                        <a href="/add-vote/{{ article[0] }}/great" class="btn btn-success">عالی بود</a>
+                        <a href="/add-vote/{{ article[0] }}/not_bad" class="btn btn-warning" style="color: white;">بد نبود</a>
+                        <a href="/add-vote/{{ article[0] }}/bad" class="btn btn-danger">اصلا خوب نبود</a><br><br>
+                        <h4>رای های ثبت شده</h4>
+                        <h5>رای های «عالی بود»: {{ great_votes }}</h5>
+                        <h5>رای های «بد نبود»: {{ not_bad_votes }}</h5>
+                        <h5>رای های «اصلا خوب نبود»: {{ bad_votes }}</h5>
+                        <br>
                     </article>
                     <!-- Comments section-->
                     <section class="mb-5">
@@ -78,7 +87,7 @@
                                                 <div class="fw-bold">{{ comment[1] }}</div>
                                                 {{ comment[3]|safe }}
                                             </div>
-                                        </div>
+                                        </div><br>
                                     {% endfor %}
                                 {% else %}
                                     <b>کامنتی یافت نشد.</b>
