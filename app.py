@@ -77,6 +77,14 @@ def create_tables_in_database():
         ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS `votes` (
+            `id` INT(255) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            `article_id` INT(255) NOT NULL,
+            `vote` VARCHAR(255) NOT NULL
+        ) ENGINE InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_persian_ci;
+    ''')
+
     db_connection.commit()
     cursor.close()
 
