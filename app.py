@@ -207,6 +207,7 @@ def get_category_articles(category_id, orderby):
     query = f"SELECT * FROM articles WHERE category_id = '{category_id}'"
     if orderby:
         query += "ORDER BY id DESC"
+    cursor.execute(query)
     articles = cursor.fetchall()
     if not articles:
         return False
