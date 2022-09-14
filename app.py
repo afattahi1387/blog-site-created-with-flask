@@ -88,6 +88,8 @@ def create_tables_in_database():
     db_connection.commit()
     cursor.close()
 
+create_tables_in_database()
+
 def get_all_users():
     """
         This function returns all users.
@@ -329,8 +331,6 @@ def search_in_articles(searched_word):
     if not articles:
         return False
     return articles
-
-create_tables_in_database()
 
 @app.route('/')
 def home():
