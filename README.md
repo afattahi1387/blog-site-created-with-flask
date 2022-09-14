@@ -55,6 +55,10 @@ For use this project, You should Create Database.
 
 For definition Database name, You should change `DB_NAME` in config.py.
 
+### Create uploads folder and articles_images folder in static folder
+
+For use upload file in this project, You should create uploads folder and articles_images folder in static folder.
+
 ### Use this project
 
 Now you can Use this project.
