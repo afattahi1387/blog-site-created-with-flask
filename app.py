@@ -333,6 +333,18 @@ def search_in_articles(searched_word):
         return False
     return articles
 
+@app.errorhandler(401)
+def unauthorized(e):
+    return render_template('401.html')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html')
+
+@app.errorhandler(500)
+def server_error(e):
+    return render_template('500.html')
+
 @app.route('/')
 def home():
     """
