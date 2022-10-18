@@ -14,24 +14,25 @@ For initial setup, performance step by step:
 
 ### Install python, MySQLdb, flask, flask_login and mysql
 
-In step 1, you should install python, Then insatll MySQLdb. you should install MySQLdb with this command in terminal or cmd:
+In step 1, you should install python, Then insatll virtualenv with this command:
 
-    pip install mysql
+    pip install virtualenv
+	
+Then in Unix/Linux/Mac, Enter this command:
 
-Or install for this commands:
+    source venv/bin/activate
+	
+And in Windows, Enter this command:
 
-    pip install python-mysql
-    pip install python-mysql-connector
+	.\venv\Scripts\activate
+	
+Or this command:
 
-Then install flask with this command:
+	.\venv\Scripts\activate.bat
+	
+Then install requirements.txt with this command:
 
-    pip install flask
-
-Then install flask_login with this command:
-
-    pip install flask-login
-
-You should install mysql in your system.
+    pip install -r requirements.txt
 
 ### Clone this project
 
